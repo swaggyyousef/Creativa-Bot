@@ -1,4 +1,4 @@
-# Discord Bot - Aiven MySQL + Free Hosting
+# Discord Bot - Koyeb Deployment
 
 ## Local Development
 Create a `.env` file in the same directory as bot.py:
@@ -11,20 +11,26 @@ MYSQL_DATABASE=your_database_name
 MYSQL_PORT=3306
 ```
 
-## Aiven MySQL Setup
-1. Go to aiven.io and create free account
-2. Create free MySQL service
-3. Get connection details from dashboard
-4. Use these details in your hosting platform
+## Koyeb Deployment Steps
+1. **Setup Database**: Create free MySQL on Aiven.io
+2. **Push to GitHub**: Your code is ready
+3. **Deploy on Koyeb**:
+   - Go to koyeb.com and create account
+   - Create new app from GitHub
+   - Select your repository
+   - Set environment variables
+   - Deploy
 
-## Deployment (Railway/Render/etc)
-1. Push code to GitHub
-2. Connect to your hosting platform
-3. Set environment variables from Aiven
-4. Deploy
+## Environment Variables for Koyeb
+- `DISCORD_TOKEN` - Your Discord bot token
+- `MYSQL_HOST` - From Aiven dashboard
+- `MYSQL_USER` - From Aiven dashboard  
+- `MYSQL_PASSWORD` - From Aiven dashboard
+- `MYSQL_DATABASE` - From Aiven dashboard
+- `MYSQL_PORT` - Usually 3306
 
 ## Features
 - 24/7 uptime with Flask keep-alive server
 - Free Aiven MySQL database
 - Auto-reply functionality
-- Scalable and reliable
+- Global edge deployment with Koyeb
