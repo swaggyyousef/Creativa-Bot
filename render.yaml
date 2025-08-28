@@ -7,11 +7,8 @@ services:
     envVars:
       - key: DISCORD_TOKEN
         sync: false
-      - key: MYSQL_HOST
-        sync: false
-      - key: MYSQL_USER
-        sync: false
-      - key: MYSQL_PASSWORD
-        sync: false
-      - key: MYSQL_DATABASE
-        sync: false
+
+databases:
+  - name: discord-bot-db
+    databaseName: discord_bot
+    user: discord_bot_user
