@@ -1,4 +1,4 @@
 discord.py>=2.3.0
 python-dotenv>=1.0.0
-# SQLite is built into Python, no extra dependencies needed
+mysql-connector-python>=8.0.0
 flask>=2.3.0

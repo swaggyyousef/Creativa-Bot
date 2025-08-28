@@ -4,7 +4,7 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from modules.auto_reply import qa
-from modules.utils.sqlite_db import initialize_database
+from modules.utils.mysql import initialize_database
 from keep_alive import keep_alive
 
 intents = discord.Intents.default()

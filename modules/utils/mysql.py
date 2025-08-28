@@ -1,29 +1,25 @@
 7import logging
-import psycopg2
-from psycopg2 import Error
+import mysql.connector
+from mysql.connector import Error
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Render provides DATABASE_URL automatically
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-# Fallback to individual variables if needed
-DB_CONFIG = {
-    'host': os.getenv('DB_HOST'),
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'database': os.getenv('DB_NAME'),
-    'port': os.getenv('DB_PORT', '5432')
+MYSQL_CONFIG = {
+    'host': os.getenv('MYSQL_HOST'),
+    'user': os.getenv('MYSQL_USER'),
+    'password': os.getenv('MYSQL_PASSWORD'),
+    'database': os.getenv('MYSQL_DATABASE'),
+    'port': os.getenv('MYSQL_PORT', '3306')
 }
 
-def execute_query(query, params=(), *, commit=True, fetch_one=False, fetch_all=False, database=None, user=None, password=None):
+def execute_query(query, params=(), *, commit=True, fetch_one=False, fetch_all=False, buffered=True, database=None, user=None, password=None):
     db = get_connection(database=database, user=user, password=password)
     if not db:
         return None
     try:
-        with db.cursor() as cursor:
+        with db.cursor(buffered=buffered) as cursor:
             cursor.execute(query, params)
             affected_rows = cursor.rowcount  # Capture the number of affected rows
             result = None
@@ -45,13 +41,7 @@ def execute_query(query, params=(), *, commit=True, fetch_one=False, fetch_all=F
 def get_connection(database=None, user=None, password=None, use_database=True):
     """Establish and return a database connection."""
     try:
-        # Use DATABASE_URL if available (Render provides this)
-        if DATABASE_URL:
-            connection = psycopg2.connect(DATABASE_URL)
-            return connection
-        
-        # Fallback to individual config
-        config = DB_CONFIG.copy()
+        config = MYSQL_CONFIG.copy()
         if database:
             config["database"] = database
         if user:
@@ -59,26 +49,27 @@ def get_connection(database=None, user=None, password=None, use_database=True):
         if password:
             config["password"] = password
         if not use_database:
-            config.pop('database', None)
-        
-        connection = psycopg2.connect(**config)
+            config.pop('database', None)  # Connect without specifying a database.
+        connection = mysql.connector.connect(**config)
         return connection
     except Error as e:
-        logging.error(f"Error connecting to PostgreSQL: {e}")
+        logging.error(f"Error connecting to MySQL: {e}")
         return None
         
 def initialize_database():
     """Initialize the database schema."""
-    db = get_connection()
+    db = get_connection(use_database=False)
     if not db:
         return
     try:
-        with db.cursor() as cursor:
+        with db.cursor(buffered=True) as cursor:
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {MYSQL_CONFIG['database']}")
+            cursor.execute(f"USE {MYSQL_CONFIG['database']}")
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS faq (
                     guild_id BIGINT PRIMARY KEY,
-                    qa JSONB DEFAULT '[]'
-                )
+                    qa JSON DEFAULT '[]'
+                           )
             """)
             db.commit()
     except Error as e:
